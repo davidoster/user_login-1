@@ -7,8 +7,11 @@ router.get('/', function(req, res) {
 	res.render('index');
 });
 
-router.post('/validate', passport.authenticate('local', { failureRedirect: '/' }),
+router.post(
+	'/validate', 
+	passport.authenticate('local', { failureRedirect: '/' }),
 	function(req, res) {
+		// console.log(req);
 		res.redirect('/home');
 	});
 
