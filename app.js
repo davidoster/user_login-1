@@ -12,6 +12,7 @@ const session = require('express-session');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const loginRouter = require('./routes/login');
+const logoutRouter = require('./routes/logout');
 const homeRouter = require('./routes/home');
 const adminRouter = require('./routes/admin');
 const bodyParser = require('body-parser');
@@ -26,8 +27,8 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(session({ secret: 'anything' }));
-app.use(passport.initialize());
+app.use(session({ secret: 'anything' })); // set the actual object of express-session
+app.use(passport.initialize()); // creates the passport object 
 app.use(passport.session());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -38,6 +39,7 @@ app.use('/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dis
 app.use('/', indexRouter); // for everybody
 app.use('/users', usersRouter); // for everybody
 app.use('/login', loginRouter); // for everybody
+app.use('/logout', logoutRouter);
 app.use('/home', homeRouter); // for logged in
 app.use('/admin', adminRouter); // for the admin or employer
 
@@ -51,6 +53,7 @@ passport.use(
 		usernameField: 'email',
 		passwordField: 'password'
 	},
+	// login
 	function(username, password, cb) {
 		db.User.findOne({
 			where: {
@@ -60,10 +63,10 @@ passport.use(
 		}).then(function(user){
 			// empty username or password, data that dont exist - non existent user
 			if (!user) { 
-				return cb(null, false); 
+				return cb(null, false); // false, no login, redirect /
 			}
 			if (user.password != password) { 
-				return cb(null, false); 
+				return cb(null, false); // false, no login, redirect /
 			}
 			return cb(null, user);
 		}).catch(function(error){
@@ -71,10 +74,15 @@ passport.use(
 		});
 	}));
 
+
+//  auth.isAuthenticated this function "returns" a user.email
+// serialize == I put something in a series of things
+// 1 2 4 5 3
 passport.serializeUser(function(user, cb) {
 	cb(null, user.email);
 });
 
+// maybe this function is ran by passport when /validate takes place 
 passport.deserializeUser(function(username, cb) {
 	db.User.findOne({
 		where: {

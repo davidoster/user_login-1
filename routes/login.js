@@ -12,7 +12,7 @@ router.post(
 	passport.authenticate('local', { failureRedirect: '/' }),
 	function(req, res) {
 		// console.log(req);
-		res.redirect('/home');
+		res.render('home');
 	});
 
 module.exports = router;

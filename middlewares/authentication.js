@@ -1,16 +1,17 @@
 module.exports = {
 	isAuthenticated : function(req, res, next) {
 		if(req.isAuthenticated()) {
-			next()
+			next();
 		}
-		res.redirect('/login')
+		res.redirect('/login');
 	},
 
 	isAdminOrEmployer: function(req, res, next) {
-		if(req._passport.session.user != null && checkRoles(req._passport.session.user, [1,2])){
+		if(req.isAuthenticated() && checkRoles(req._passport.session.user, [1,2])) {
+		//if(req._passport.session?.user != null && checkRoles(req._passport.session.user, [1,2])){
 			next();
 		}
-		res.redirect('/home');
+		res.redirect('/');
 	}
 }
 
